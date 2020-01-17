@@ -1,5 +1,8 @@
 ﻿@page "/review"
+
 @using Tesla.Models
+@using Tesla.Services
+
 @inject IJSRuntime JSRuntime;
 @inject Tesla.Business.Services.IReviewService service
 
@@ -10,19 +13,25 @@
     <ValidationSummary />
     <p>
         <label for="content">Review: </label>
-        <InputTextArea class="form-control " rows="3" placeholder="Reivew" id="content" @bind-Value="model.Content" />
+        <InputTextArea class="form-control " rows="3" placeholder="Reivew" 
+                      @oninput="UpdateScore" id="content" @bind-Value="model.Content" />
     </p>
     <p>
         <label for="sentiment">Like/Dislike: </label>
         <InputCheckbox class="" id="sentiment" @bind-Value="model.Sentiment" />
     </p>
-    
+
 
     <button type="submit" class="btn btn-primary mt-1">Submit</button>
 </EditForm>
 
+<HappinessScale Value=@happiness />
+
 
 @code {
+
+    [Parameter]
+    public float happiness { get; set; } = 50;
 
     private ReviewModel model = new ReviewModel();
 
@@ -34,5 +43,19 @@
         await JSRuntime.InvokeAsync<string>(
             "review.showAlert", "Review added successfully"
             );
+    }
+
+
+    private void UpdateScore(ChangeEventArgs e)
+    {
+        string targetText = (string)e.Value;
+
+        var score = Sentiment.Predict(targetText).Score;
+        happiness = CalculatePercentage(score);
+    }
+
+    public float CalculatePercentage(double value)
+    {
+        return 100 * (1.0f / (1.0f + (float)Math.Exp(-value)));
     }
 }

@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <None Update="MLModel.zip">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   
